@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface de Chat</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Efeito Glassmorphism geral */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+
+        /* === TELA DE LOGIN === */
+        #login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            text-align: center;
+            z-index: 10;
+        }
+
+        #login-container h2 {
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        .input-group input[type="file"] {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* === TELA DO CHAT === */
+        #chat-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        /* Cabeçalho do Chat */
+        .chat-header {
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            background-size: cover;
+            background-position: center;
+            margin-right: 1rem;
+            border: 2px solid var(--glass-border);
+        }
+
+        /* Área de Mensagens */
+        .chat-messages {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 1rem;
+            border-radius: 12px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--accent);
+            border-bottom-right-radius: 2px;
+        }
+
+        .message img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .message a {
+            color: #bae6fd;
+            text-decoration: underline;
+        }
+
+        /* Área de Input */
+        .chat-input-area {
+            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.9);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chat-input-area input[type="text"] {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .action-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            margin-top: 0;
+        }
+
+        .action-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Esconder inputs de arquivo nativos no chat */
+        #photo-upload {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-container" class="glass">
+        <h2>Entrar no Chat</h2>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="user-photo">Foto de Perfil</label>
+                <input type="file" id="user-photo" accept="image/*">
+            </div>
+            <div class="input-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" required placeholder="seu@email.com">
+            </div>
+            <div class="input-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+
+    <div id="chat-container">
+        <header class="chat-header">
+            <div id="display-avatar" class="user-avatar"></div>
+            <div>
+                <h3 id="display-email">Usuário</h3>
+                <small style="color: var(--text-muted);">Online</small>
+            </div>
+        </header>
+
+        <div class="chat-messages" id="messages-box">
+            </div>
+
+        <div class="chat-input-area">
+            <label for="photo-upload" class="action-btn" title="Enviar Foto">
+                📷
+            </label>
+            <input type="file" id="photo-upload" accept="image/*">
+            
+            <button type="button" class="action-btn" id="link-btn" title="Inserir Link">🔗</button>
+
+            <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+            
+            <button type="button" class="action-btn" id="send-btn" style="background: var(--accent); color: white; border: none;">
+                ➤
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos da interface
+        const loginContainer = document.getElementById('login-container');
+        const chatContainer = document.getElementById('chat-container');
+        const loginForm = document.getElementById('login-form');
+        const messagesBox = document.getElementById('messages-box');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const linkBtn = document.getElementById('link-btn');
+        const photoUpload = document.getElementById('photo-upload');
+
+        let userPhotoURL = '';
+
+        // Sistema de Login (Simulação)
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const photoInput = document.getElementById('user-photo');
+
+            // Lidar com a foto de perfil enviada no login
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    userPhotoURL = e.target.result;
+                    document.getElementById('display-avatar').style.backgroundImage = `url(${userPhotoURL})`;
+                }
+                reader.readAsDataURL(photoInput.files[0]);
+            }
+
+            document.getElementById('display-email').innerText = email.split('@')[0];
+            
+            // Transição de tela
+            loginContainer.style.display = 'none';
+            chatContainer.style.display = 'flex';
+        });
+
+        // Função para adicionar mensagem na tela
+        function addMessage(content, type = 'text') {
+            if (!content) return;
+
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', 'sent');
+
+            if (type === 'text' || type === 'link') {
+                msgDiv.innerHTML = content;
+            } else if (type === 'image') {
+                const img = document.createElement('img');
+                img.src = content;
+                msgDiv.appendChild(img);
+            }
+
+            messagesBox.appendChild(msgDiv);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        // Enviar mensagem de texto
+        sendBtn.addEventListener('click', () => {
+            const text = messageInput.value.trim();
+            if (text !== '') {
+                addMessage(text, 'text');
+                messageInput.value = '';
+            }
+        });
+
+        // Enviar mensagem com Enter
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+
+        // Inserir Link na área de input
+        linkBtn.addEventListener('click', () => {
+            const url = prompt('Digite o link da URL:');
+            const linkText = prompt('Digite o texto do link:');
+            if (url && linkText) {
+                const anchor = `<a href="${url}" target="_blank">${linkText}</a>`;
+                addMessage(anchor, 'link');
+            }
+        });
+
+        // Enviar Foto no chat
+        photoUpload.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addMessage(e.target.result, 'image');
+                }
+                reader.readAsDataURL(this.files[0]);
+                this.value = ''; // Limpar input
+            }
+        });
+    </script>
+</body>
+</html>
