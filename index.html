@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WhatSidvix</title>
 
+<!-- FIREBASE CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
 <style>
 :root {
   --bg-color: #0f172a;
   --accent: #3b82f6;
-  --accent-hover: #2563eb;
   --text-main: #f8fafc;
-  --text-muted: #94a3b8;
 }
 
-/* RESET */
 * {
   margin:0;
   padding:0;
@@ -28,14 +30,12 @@ body {
   justify-content:center;
   align-items:center;
   color:var(--text-main);
-
   background:
     radial-gradient(circle at 20% 30%, rgba(59,130,246,0.1), transparent),
     radial-gradient(circle at 80% 70%, rgba(59,130,246,0.08), transparent),
     #0f172a;
 }
 
-/* GLASS */
 .glass {
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
@@ -43,7 +43,6 @@ body {
   border-radius:16px;
 }
 
-/* LOGIN */
 #login-container {
   width:90%;
   max-width:400px;
@@ -70,7 +69,6 @@ button {
   cursor:pointer;
 }
 
-/* CHAT */
 #chat-container {
   display:none;
   width:100%;
@@ -78,13 +76,11 @@ button {
   flex-direction:column;
 }
 
-/* HEADER */
 .chat-header {
   display:flex;
   align-items:center;
   padding:1rem;
   background:#0f172a;
-  border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
 .avatar {
@@ -108,10 +104,8 @@ button {
   right:0;
   top:30px;
   padding:10px;
-  min-width:150px;
 }
 
-/* MESSAGES */
 .messages {
   flex:1;
   overflow:auto;
@@ -127,7 +121,6 @@ button {
   margin-left:auto;
 }
 
-/* INPUT */
 .input-area {
   display:flex;
   padding:10px;
@@ -153,7 +146,6 @@ button {
 
 <body>
 
-<!-- LOGIN -->
 <div id="login-container" class="glass">
   <h2>Entrar</h2>
   <input type="file" id="photo">
@@ -163,14 +155,13 @@ button {
   <button id="enter">Entrar</button>
 </div>
 
-<!-- CHAT -->
 <div id="chat-container">
 
   <div class="chat-header">
     <div id="avatar" class="avatar"></div>
     <div>
       <div id="username">Usuário</div>
-      <small style="color:gray">Online</small>
+      <small>Online</small>
     </div>
 
     <div class="menu" id="menuBtn">⋮
@@ -185,10 +176,7 @@ button {
   <div class="messages" id="msgs"></div>
 
   <div class="input-area">
-    
-    <label for="upload" class="icon-btn">
-      📷
-    </label>
+    <label for="upload" class="icon-btn">📷</label>
     <input type="file" id="upload" hidden>
 
     <div class="icon-btn" id="linkBtn">🔗</div>
@@ -202,42 +190,53 @@ button {
 
 <script>
 
+// FIREBASE INIT
+const firebaseConfig = {
+  apiKey: "AIzaSyC6U5qrQ9jBVIDP3K6W7mvfRYhktoKQKzU",
+  authDomain: "whatsidvix.firebaseapp.com",
+  projectId: "whatsidvix",
+  storageBucket: "whatsidvix.firebasestorage.app",
+  messagingSenderId: "842481043245",
+  appId: "1:842481043245:web:81fd4a9563067711a3f5a4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
 // ELEMENTOS
 const login = document.getElementById('login-container')
 const chat = document.getElementById('chat-container')
-const enter = document.getElementById('enter')
-
 const avatar = document.getElementById('avatar')
 const username = document.getElementById('username')
-
 const msgs = document.getElementById('msgs')
 const msgInput = document.getElementById('msgInput')
 
 // LOGIN
-enter.onclick = () => {
+document.getElementById('enter').onclick = () => {
   const name = document.getElementById('name').value
   const file = document.getElementById('photo').files[0]
 
-  if(name) {
+  if(name){
     username.innerText = name
     localStorage.setItem('name', name)
   }
 
-  if(file) {
+  if(file){
     const reader = new FileReader()
-    reader.onload = e => {
+    reader.onload = e=>{
       avatar.style.backgroundImage = `url(${e.target.result})`
       localStorage.setItem('photo', e.target.result)
     }
     reader.readAsDataURL(file)
   }
 
-  login.style.display = 'none'
-  chat.style.display = 'flex'
+  login.style.display='none'
+  chat.style.display='flex'
 }
 
 // LOAD
-window.onload = () => {
+window.onload = ()=>{
   const name = localStorage.getItem('name')
   const photo = localStorage.getItem('photo')
 
@@ -246,83 +245,72 @@ window.onload = () => {
 }
 
 // MENU
-const menuBtn = document.getElementById('menuBtn')
-const menu = document.getElementById('menu')
-
-menuBtn.onclick = () => {
-  menu.style.display = menu.style.display === 'block' ? 'none' : 'block'
+menuBtn.onclick = ()=>{
+  menu.style.display = menu.style.display === 'block' ? 'none':'block'
 }
 
-// EDIT NAME
-document.getElementById('editName').onclick = () => {
-  const newName = prompt('Novo nome:')
-  if(newName){
-    username.innerText = newName
-    localStorage.setItem('name', newName)
-  }
+// ENVIAR TEXTO (FIREBASE)
+send.onclick = async ()=>{
+  const text = msgInput.value.trim()
+  if(!text) return
+
+  await db.collection("messages").add({
+    text,
+    name: localStorage.getItem('name'),
+    timestamp: Date.now()
+  })
+
+  msgInput.value=''
 }
 
-// EDIT PHOTO
-document.getElementById('editPhoto').onclick = () => {
-  document.getElementById('photo').click()
-}
+// RECEBER TEMPO REAL
+db.collection("messages")
+.orderBy("timestamp")
+.onSnapshot(snapshot=>{
+  msgs.innerHTML=''
 
-// SHARE
-document.getElementById('share').onclick = () => {
-  if(navigator.share){
-    navigator.share({
-      title:'WhatSidvix',
-      text:'Vem usar esse chat!',
-      url:location.href
-    })
-  }
-}
-
-// SEND MSG
-document.getElementById('send').onclick = () => {
-  if(msgInput.value){
+  snapshot.forEach(doc=>{
+    const data = doc.data()
     const div = document.createElement('div')
-    div.className = 'msg'
-    div.innerText = msgInput.value
-    msgs.appendChild(div)
-    msgInput.value = ''
-  }
-}
+    div.className='msg'
 
-// ENTER
-msgInput.addEventListener('keypress', e=>{
-  if(e.key==='Enter') document.getElementById('send').click()
+    if(data.text){
+      div.innerHTML = `<strong>${data.name}</strong><br>${data.text}`
+    }
+
+    if(data.image){
+      div.innerHTML = `<img src="${data.image}" style="max-width:200px;">`
+    }
+
+    msgs.appendChild(div)
+  })
+
+  msgs.scrollTop = msgs.scrollHeight
 })
 
-// LINK
-document.getElementById('linkBtn').onclick = ()=>{
-  const url = prompt('Link:')
-  if(url){
-    const div = document.createElement('div')
-    div.className = 'msg'
-    div.innerHTML = `<a href="${url}" target="_blank">${url}</a>`
-    msgs.appendChild(div)
-  }
+// UPLOAD IMAGEM
+upload.onchange = async function(){
+  const file = this.files[0]
+  if(!file) return
+
+  const ref = storage.ref('images/'+Date.now())
+  await ref.put(file)
+
+  const url = await ref.getDownloadURL()
+
+  await db.collection("messages").add({
+    image:url,
+    name: localStorage.getItem('name'),
+    timestamp: Date.now()
+  })
 }
 
-// IMAGE SEND
-document.getElementById('upload').onchange = function(){
-  const file = this.files[0]
-  const reader = new FileReader()
-
-  reader.onload = e=>{
-    const img = document.createElement('img')
-    img.src = e.target.result
-    img.style.maxWidth = '200px'
-
-    const div = document.createElement('div')
-    div.className = 'msg'
-    div.appendChild(img)
-
-    msgs.appendChild(div)
+// LINK
+linkBtn.onclick = ()=>{
+  const url = prompt('Link:')
+  if(url){
+    sendMessage(url)
   }
-
-  reader.readAsDataURL(file)
 }
 
 </script>
