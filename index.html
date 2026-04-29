@@ -106,6 +106,7 @@ body{
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <div class="avatar">W</div>
   <div class="header-info">
@@ -117,39 +118,85 @@ body{
   </div>
 </div>
 
-<div class="chat" id="chat">
+<!-- CHAT -->
+<div class="chat" id="chat"></div>
 
-  <div class="msg received">
-    Olá! Tudo bem?
-    <div class="time">10:26</div>
-  </div>
-
-  <div class="msg sent">
-    Vamos marcar para amanhã?
-    <div class="time">20:40</div>
-  </div>
-
-</div>
-
+<!-- INPUT -->
 <div class="input-area">
-  <div class="btn">📎</div>
-  <div class="btn">📷</div>
+
+  <!-- BOTÃO GALERIA -->
+  <div class="btn" onclick="document.getElementById('fileInput').click()">📎</div>
+
+  <!-- INPUT ESCONDIDO -->
+  <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+  <!-- TEXTO -->
   <input id="msgInput" placeholder="Digite sua mensagem...">
+
+  <!-- ENVIAR -->
   <div class="btn" onclick="send()">➤</div>
+
 </div>
 
 <script>
 
+// ENVIAR TEXTO
 function send(){
-  const text = document.getElementById('msgInput').value
+  const input = document.getElementById('msgInput')
+  let text = input.value.trim()
   if(!text) return
+
+  // detectar link
+  if(text.startsWith('http')){
+    text = `<a href="${text}" target="_blank" style="color:#fff">${text}</a>`
+  }
 
   const div = document.createElement('div')
   div.className = 'msg sent'
-  div.innerHTML = text + `<div class="time">${new Date().getHours()}:${new Date().getMinutes()}</div>`
+  div.innerHTML = text + `<div class="time">${hora()}</div>`
 
   document.getElementById('chat').appendChild(div)
-  document.getElementById('msgInput').value=''
+  input.value=''
+  scroll()
+}
+
+// ENTER
+document.getElementById('msgInput').addEventListener('keypress', e=>{
+  if(e.key === 'Enter'){
+    send()
+  }
+})
+
+// ENVIAR IMAGEM
+document.getElementById('fileInput').onchange = function(){
+  const file = this.files[0]
+  if(!file) return
+
+  const reader = new FileReader()
+
+  reader.onload = function(e){
+    const div = document.createElement('div')
+    div.className = 'msg sent'
+    div.innerHTML = `<img src="${e.target.result}" style="max-width:200px;border-radius:10px">
+    <div class="time">${hora()}</div>`
+
+    document.getElementById('chat').appendChild(div)
+    scroll()
+  }
+
+  reader.readAsDataURL(file)
+}
+
+// HORA
+function hora(){
+  const d = new Date()
+  return d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0')
+}
+
+// SCROLL
+function scroll(){
+  const chat = document.getElementById('chat')
+  chat.scrollTop = chat.scrollHeight
 }
 
 </script>
