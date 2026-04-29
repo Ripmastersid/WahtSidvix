@@ -7,57 +7,61 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #1a0b0b; color: white; font-family: sans-serif; }
+        body { background-color: #1a0b0b; color: white; font-family: sans-serif; overflow: hidden; }
         .bg-vinho-dark { background-color: #3d0a0a; }
-        .bg-chat { background-color: #1a0b0b; }
-        .msg-me { background-color: #5c0f0f; border-radius: 10px 0 10px 10px; }
-        .msg-other { background-color: #262626; border-radius: 0 10px 10px 10px; }
-        #chat-window { height: calc(100vh - 130px); overflow-y: auto; }
+        .msg-me { background-color: #5c0f0f; align-self: flex-end; border-radius: 10px 0 10px 10px; }
+        .msg-other { background-color: #262626; align-self: flex-start; border-radius: 0 10px 10px 10px; }
+        #chat-window { height: calc(100vh - 140px); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        input::placeholder { color: #888; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <div id="auth-screen" class="fixed inset-0 bg-vinho-dark z-50 flex flex-col items-center justify-center p-6">
-        <h1 class="text-3xl font-bold mb-6">WhatSidvix</h1>
-        <input type="text" id="reg-name" placeholder="Seu Nome" class="w-full max-w-xs p-3 rounded bg-black mb-3 border border-red-900">
-        <input type="text" id="reg-photo" placeholder="URL da Foto (opcional)" class="w-full max-w-xs p-3 rounded bg-black mb-3 border border-red-900">
-        <input type="email" id="reg-email" placeholder="E-mail" class="w-full max-w-xs p-3 rounded bg-black mb-3 border border-red-900">
-        <input type="password" id="reg-pass" placeholder="Senha" class="w-full max-w-xs p-3 rounded bg-black mb-6 border border-red-900">
-        <button onclick="cadastrar()" class="bg-red-700 px-10 py-3 rounded-full font-bold">ENTRAR NO CHAT</button>
+    <div id="auth-screen" class="fixed inset-0 bg-[#1a0b0b] z-50 flex flex-col items-center justify-center p-6 text-center">
+        <h1 class="text-4xl font-bold mb-8 text-red-700">WhatSidvix</h1>
+        
+        <div class="relative mb-6">
+            <img id="preview-img" src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full border-4 border-red-900 object-cover">
+            <label for="profile-upload" class="absolute bottom-0 right-0 bg-red-700 p-2 rounded-full cursor-pointer">
+                <i class="fas fa-camera text-white text-xs"></i>
+            </label>
+            <input type="file" id="profile-upload" class="hidden" accept="image/*">
+        </div>
+
+        <input type="text" id="reg-name" placeholder="Seu Nome" class="w-full max-w-xs p-4 rounded-xl bg-zinc-900 mb-3 border border-red-900 outline-none">
+        <input type="email" id="reg-email" placeholder="E-mail" class="w-full max-w-xs p-4 rounded-xl bg-zinc-900 mb-3 border border-red-900 outline-none">
+        <input type="password" id="reg-pass" placeholder="Senha" class="w-full max-w-xs p-4 rounded-xl bg-zinc-900 mb-8 border border-red-900 outline-none">
+        
+        <button onclick="cadastrar()" class="bg-red-700 w-full max-w-xs py-4 rounded-full font-bold shadow-lg active:scale-95 transition">ENTRAR NO CHAT</button>
     </div>
 
-    <header class="bg-vinho-dark p-3 flex items-center justify-between shadow-lg">
+    <header class="bg-vinho-dark p-3 flex items-center justify-between shadow-2xl">
         <div class="flex items-center gap-3">
-            <i class="fas fa-arrow-left"></i>
-            <img id="user-avatar" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full border border-red-800">
+            <i class="fas fa-arrow-left text-gray-300"></i>
+            <img id="user-avatar-header" src="" class="w-10 h-10 rounded-full border border-red-800 object-cover">
             <div>
-                <h2 class="font-bold text-sm">WhatSidvix</h2>
-                <span class="text-xs text-gray-400">Online</span>
+                <h2 class="font-bold text-sm" id="display-chat-name">WhatSidvix</h2>
+                <span class="text-[10px] text-green-500">● Online</span>
             </div>
         </div>
-        <div class="flex gap-4 text-lg">
+        <div class="flex gap-5 text-gray-300 mr-2">
             <i class="fas fa-video"></i>
             <i class="fas fa-phone"></i>
             <i class="fas fa-ellipsis-v"></i>
         </div>
     </header>
 
-    <main id="chat-window" class="flex-1 p-4 flex flex-col gap-3 bg-chat">
+    <main id="chat-window">
         </main>
 
-    <footer class="p-2 flex items-center gap-2 bg-chat">
-        <div class="flex-1 bg-zinc-900 rounded-full flex items-center px-4 py-2 gap-3">
-            <i class="far fa-smile text-gray-400"></i>
-            <input type="text" id="msg-input" placeholder="Mensagem" class="bg-transparent flex-1 outline-none text-sm">
-            
-            <label for="file-input" class="cursor-pointer">
-                <i class="fas fa-paperclip text-gray-400"></i>
-            </label>
-            <input type="file" id="file-input" class="hidden" accept="image/*">
-            
+    <footer class="p-3 bg-[#1a0b0b] flex items-center gap-2">
+        <div class="flex-1 bg-zinc-900 rounded-full flex items-center px-4 py-3 gap-3">
+            <i class="far fa-smile text-gray-400 text-xl"></i>
+            <input type="text" id="msg-input" placeholder="Mensagem" class="bg-transparent flex-1 outline-none text-white text-sm">
+            <i class="fas fa-paperclip text-gray-400 -rotate-45"></i>
             <i class="fas fa-camera text-gray-400"></i>
         </div>
-        <button onclick="enviarMensagem()" class="bg-red-800 w-12 h-12 rounded-full flex items-center justify-center text-white">
+        <button onclick="enviarMensagem()" class="bg-red-800 w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg">
             <i class="fas fa-paper-plane"></i>
         </button>
     </footer>
@@ -67,12 +71,12 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // COLOQUE SEU CÓDIGO AQUI
+        // IMPORTANTE: Cole seus dados reais aqui dentro das aspas
         const firebaseConfig = {
-            apiKey: "COLE_AQUI",
-            authDomain: "COLE_AQUI",
-            projectId: "COLE_AQUI",
-            storageBucket: "COLE_AQUI",
+            apiKey: "COLE_AQUI_SUA_API_KEY",
+            authDomain: "whatsidvix.firebaseapp.com",
+            projectId: "whatsidvix",
+            storageBucket: "whatsidvix.appspot.com",
             messagingSenderId: "COLE_AQUI",
             appId: "COLE_AQUI"
         };
@@ -81,27 +85,37 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CADASTRO E LOGIN
+        let fotoBase64 = "https://via.placeholder.com/150";
+
+        // Preview da imagem da galeria
+        document.getElementById('profile-upload').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                fotoBase64 = reader.result;
+                document.getElementById('preview-img').src = reader.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
         window.cadastrar = async () => {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const nome = document.getElementById('reg-name').value;
-            const foto = document.getElementById('reg-photo').value || "https://via.placeholder.com/150";
+
+            if(!nome || !email || !pass) return alert("Preencha tudo!");
 
             try {
                 const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await updateProfile(res.user, { displayName: nome, photoURL: foto });
-                document.getElementById('auth-screen').classList.add('hidden');
+                await updateProfile(res.user, { displayName: nome, photoURL: fotoBase64 });
+                document.getElementById('auth-screen').style.display = 'none';
             } catch (e) {
-                // Se já existir, tenta logar
                 try {
                     await signInWithEmailAndPassword(auth, email, pass);
-                    document.getElementById('auth-screen').classList.add('hidden');
-                } catch (err) { alert("Erro: " + err.message); }
+                    document.getElementById('auth-screen').style.display = 'none';
+                } catch (err) { alert("Erro: Verifique sua API Key no código."); }
             }
         };
 
-        // ENVIAR MENSAGEM
         window.enviarMensagem = async () => {
             const input = document.getElementById('msg-input');
             if(!input.value.trim()) return;
@@ -116,29 +130,26 @@
             input.value = "";
         };
 
-        // LER MENSAGENS EM TEMPO REAL
-        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
-        onSnapshot(q, (snapshot) => {
+        onSnapshot(query(collection(db, "mensagens"), orderBy("timestamp", "asc")), (snap) => {
             const win = document.getElementById('chat-window');
             win.innerHTML = "";
-            snapshot.forEach(doc => {
+            snap.forEach(doc => {
                 const data = doc.data();
                 const isMe = data.uid === auth.currentUser?.uid;
                 win.innerHTML += `
-                    <div class="max-w-[80%] p-2 ${isMe ? 'msg-me self-end' : 'msg-other self-start text-white'}">
-                        <p class="text-xs text-red-400 font-bold">${isMe ? 'Você' : data.nome}</p>
-                        <p class="text-sm">${data.texto}</p>
+                    <div class="${isMe ? 'msg-me' : 'msg-other'} p-3 max-w-[85%] shadow-md">
+                        ${!isMe ? `<p class="text-[10px] font-bold text-red-500 mb-1">${data.nome}</p>` : ''}
+                        <p class="text-sm leading-tight">${data.texto}</p>
                     </div>
                 `;
             });
             win.scrollTop = win.scrollHeight;
         });
 
-        // VERIFICAR SE JÁ ESTÁ LOGADO
         onAuthStateChanged(auth, (user) => {
             if(user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('user-avatar').src = user.photoURL;
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('user-avatar-header').src = user.photoURL;
             }
         });
     </script>
