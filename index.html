@@ -2,61 +2,62 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatSidvix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f0a0a; color: #e9edef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .bg-vinho { background-color: #451010; }
-        .bg-chat { background-color: #1a0f0f; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; }
-        .msg-me { background-color: #631515; border-radius: 15px 15px 0 15px; align-self: flex-end; }
-        .msg-other { background-color: #262626; border-radius: 15px 15px 15px 0; align-self: flex-start; }
-        .input-area { background-color: #1f1f1f; border-radius: 25px; }
-        #auth-screen { z-index: 100; transition: 0.5s; }
-        .profile-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        body { background-color: #1a0b0b; color: white; font-family: sans-serif; }
+        .bg-vinho-dark { background-color: #3d0a0a; }
+        .bg-chat { background-color: #1a0b0b; }
+        .msg-me { background-color: #5c0f0f; border-radius: 10px 0 10px 10px; }
+        .msg-other { background-color: #262626; border-radius: 0 10px 10px 10px; }
+        #chat-window { height: calc(100vh - 130px); overflow-y: auto; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="flex flex-col h-screen">
 
-    <div id="auth-screen" class="fixed inset-0 bg-vinho flex flex-col items-center justify-center p-6">
-        <h1 class="text-3xl font-bold mb-8">WhatSidvix</h1>
-        <div class="w-full max-w-sm space-y-4">
-            <input type="text" id="reg-name" placeholder="Nome Completo" class="w-full p-3 rounded bg-zinc-800 border-none outline-none">
-            <input type="text" id="reg-photo" placeholder="URL da Foto de Perfil" class="w-full p-3 rounded bg-zinc-800 border-none outline-none">
-            <input type="email" id="reg-email" placeholder="E-mail" class="w-full p-3 rounded bg-zinc-800 border-none outline-none">
-            <input type="password" id="reg-pass" placeholder="Senha" class="w-full p-3 rounded bg-zinc-800 border-none outline-none">
-            <button onclick="registrar()" class="w-full bg-red-600 p-3 rounded font-bold hover:bg-red-700 transition">Entrar no Chat</button>
-        </div>
+    <div id="auth-screen" class="fixed inset-0 bg-vinho-dark z-50 flex flex-col items-center justify-center p-6">
+        <h1 class="text-3xl font-bold mb-6">WhatSidvix</h1>
+        <input type="text" id="reg-name" placeholder="Seu Nome" class="w-full max-w-xs p-3 rounded bg-black mb-3 border border-red-900">
+        <input type="text" id="reg-photo" placeholder="URL da Foto (opcional)" class="w-full max-w-xs p-3 rounded bg-black mb-3 border border-red-900">
+        <input type="email" id="reg-email" placeholder="E-mail" class="w-full max-w-xs p-3 rounded bg-black mb-3 border border-red-900">
+        <input type="password" id="reg-pass" placeholder="Senha" class="w-full max-w-xs p-3 rounded bg-black mb-6 border border-red-900">
+        <button onclick="cadastrar()" class="bg-red-700 px-10 py-3 rounded-full font-bold">ENTRAR NO CHAT</button>
     </div>
 
-    <header class="bg-vinho p-3 flex items-center justify-between shadow-lg">
-        <div class="flex items-center space-x-3">
+    <header class="bg-vinho-dark p-3 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-3">
             <i class="fas fa-arrow-left"></i>
-            <img id="header-img" src="https://via.placeholder.com/40" class="profile-img">
+            <img id="user-avatar" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full border border-red-800">
             <div>
-                <p id="header-name" class="font-bold">WhatSidvix</p>
-                <p class="text-xs text-zinc-400">Online</p>
+                <h2 class="font-bold text-sm">WhatSidvix</h2>
+                <span class="text-xs text-gray-400">Online</span>
             </div>
         </div>
-        <div class="flex space-x-5 text-xl items-center">
-            <i class="fas fa-video text-zinc-300"></i>
-            <i class="fas fa-phone text-zinc-300"></i>
-            <i class="fas fa-ellipsis-v text-zinc-300 cursor-pointer" onclick="alert('Opções: Perfil, Limpar, Sair')"></i>
+        <div class="flex gap-4 text-lg">
+            <i class="fas fa-video"></i>
+            <i class="fas fa-phone"></i>
+            <i class="fas fa-ellipsis-v"></i>
         </div>
     </header>
 
-    <main id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-chat">
+    <main id="chat-window" class="flex-1 p-4 flex flex-col gap-3 bg-chat">
         </main>
 
-    <footer class="p-2 flex items-center space-x-2 bg-transparent">
-        <div class="flex-1 flex items-center input-area px-4 py-1">
-            <i class="far fa-laugh text-zinc-400 text-xl cursor-pointer"></i>
-            <input type="text" id="msg-input" placeholder="Mensagem" class="flex-1 bg-transparent p-2 outline-none">
-            <label for="img-link-prompt"><i class="fas fa-paperclip text-zinc-400 text-xl ml-2 cursor-pointer" onclick="enviarImagem()"></i></label>
-            <i class="fas fa-camera text-zinc-400 text-xl ml-4"></i>
+    <footer class="p-2 flex items-center gap-2 bg-chat">
+        <div class="flex-1 bg-zinc-900 rounded-full flex items-center px-4 py-2 gap-3">
+            <i class="far fa-smile text-gray-400"></i>
+            <input type="text" id="msg-input" placeholder="Mensagem" class="bg-transparent flex-1 outline-none text-sm">
+            
+            <label for="file-input" class="cursor-pointer">
+                <i class="fas fa-paperclip text-gray-400"></i>
+            </label>
+            <input type="file" id="file-input" class="hidden" accept="image/*">
+            
+            <i class="fas fa-camera text-gray-400"></i>
         </div>
-        <button onclick="enviarTexto()" class="bg-red-700 w-12 h-12 rounded-full flex items-center justify-center text-white">
+        <button onclick="enviarMensagem()" class="bg-red-800 w-12 h-12 rounded-full flex items-center justify-center text-white">
             <i class="fas fa-paper-plane"></i>
         </button>
     </footer>
@@ -66,95 +67,80 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // COLOQUE SEU CÓDIGO AQUI
         const firebaseConfig = {
-            apiKey: "AIzaSyC6U5qrQ9jBVIDP3K6W7mvfRYhktoKQKzU",
-            authDomain: "whatsidvix.firebaseapp.com",
-            projectId: "whatsidvix",
-            storageBucket: "whatsidvix.firebasestorage.app",
-            messagingSenderId: "842481043245",
-            appId: "1:842481043245:web:81fd4a9563067711a3f5a4"
+            apiKey: "COLE_AQUI",
+            authDomain: "COLE_AQUI",
+            projectId: "COLE_AQUI",
+            storageBucket: "COLE_AQUI",
+            messagingSenderId: "COLE_AQUI",
+            appId: "COLE_AQUI"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // LOGIN / REGISTRO
-        window.registrar = async () => {
+        // CADASTRO E LOGIN
+        window.cadastrar = async () => {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const nome = document.getElementById('reg-name').value;
-            const foto = document.getElementById('reg-photo').value || "https://ui-avatars.com/api/?name=" + nome;
+            const foto = document.getElementById('reg-photo').value || "https://via.placeholder.com/150";
 
             try {
                 const res = await createUserWithEmailAndPassword(auth, email, pass);
                 await updateProfile(res.user, { displayName: nome, photoURL: foto });
+                document.getElementById('auth-screen').classList.add('hidden');
             } catch (e) {
-                try { await signInWithEmailAndPassword(auth, email, pass); } 
-                catch (err) { alert("Erro: " + err.message); }
+                // Se já existir, tenta logar
+                try {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                    document.getElementById('auth-screen').classList.add('hidden');
+                } catch (err) { alert("Erro: " + err.message); }
             }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('auth-screen').style.transform = 'translateY(-100%)';
-                document.getElementById('header-img').src = user.photoURL;
-                carregarMensagens();
-            }
-        });
-
         // ENVIAR MENSAGEM
-        window.enviarTexto = async () => {
+        window.enviarMensagem = async () => {
             const input = document.getElementById('msg-input');
-            if (!input.value.trim()) return;
+            if(!input.value.trim()) return;
 
             await addDoc(collection(db, "mensagens"), {
+                texto: input.value,
                 nome: auth.currentUser.displayName,
                 uid: auth.currentUser.uid,
-                texto: input.value,
                 foto: auth.currentUser.photoURL,
                 timestamp: serverTimestamp()
             });
             input.value = "";
         };
 
-        window.enviarImagem = async () => {
-            const url = prompt("Cole o link da imagem aqui:");
-            if (url) {
-                await addDoc(collection(db, "mensagens"), {
-                    nome: auth.currentUser.displayName,
-                    uid: auth.currentUser.uid,
-                    imagem: url,
-                    foto: auth.currentUser.photoURL,
-                    timestamp: serverTimestamp()
-                });
-            }
-        };
-
-        // CARREGAR CHAT EM TEMPO REAL
-        function carregarMensagens() {
-            const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
-            onSnapshot(q, (snapshot) => {
-                const box = document.getElementById('chat-box');
-                box.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const m = doc.data();
-                    const isMe = m.uid === auth.currentUser.uid;
-                    const content = m.imagem ? `<img src="${m.imagem}" class="rounded-lg max-w-full">` : m.texto;
-                    
-                    box.innerHTML += `
-                        <div class="max-w-[80%] p-3 shadow-sm ${isMe ? 'msg-me' : 'msg-other'}">
-                            ${!isMe ? `<p class="text-[10px] text-red-400 font-bold">${m.nome}</p>` : ''}
-                            <div class="text-sm">${content}</div>
-                            <p class="text-[9px] text-zinc-400 text-right mt-1">
-                                ${m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...'}
-                            </p>
-                        </div>
-                    `;
-                });
-                box.scrollTop = box.scrollHeight;
+        // LER MENSAGENS EM TEMPO REAL
+        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
+        onSnapshot(q, (snapshot) => {
+            const win = document.getElementById('chat-window');
+            win.innerHTML = "";
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const isMe = data.uid === auth.currentUser?.uid;
+                win.innerHTML += `
+                    <div class="max-w-[80%] p-2 ${isMe ? 'msg-me self-end' : 'msg-other self-start text-white'}">
+                        <p class="text-xs text-red-400 font-bold">${isMe ? 'Você' : data.nome}</p>
+                        <p class="text-sm">${data.texto}</p>
+                    </div>
+                `;
             });
-        }
+            win.scrollTop = win.scrollHeight;
+        });
+
+        // VERIFICAR SE JÁ ESTÁ LOGADO
+        onAuthStateChanged(auth, (user) => {
+            if(user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('user-avatar').src = user.photoURL;
+            }
+        });
     </script>
 </body>
 </html>
